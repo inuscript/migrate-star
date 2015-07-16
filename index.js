@@ -1,21 +1,33 @@
-var request = require("request")
-// var GitHubApi = require("github")
+var requestAllPages = require("request-all-pages")
+var GitHubApi = require("github")
 var oldName = "suisho"
 var starListUrl = "https://api.github.com/users/" + oldName + "/starred"
+
 var option = {  
-  url: starListUrl,
+  uri: starListUrl,
+  json: true,
+  body: {},
   headers: {
     'User-Agent': 'Request'
   }
 }
 
-
-request(option, function(err, res, body){
-  console.log(res.headers.link)
-  var data = JSON.parse(body).map(function(item){
-    return item.full_name
+var requestCurrentStarred = new Promise(function(resolve, reject){
+  requestAllPages(option, function(err, pages){
+    var repos = pages.reduce(function(acc, page){
+      var data = page.body.map(function(item){
+        return item.full_name
+      })
+      return acc.concat(data)
+    }, [])
+    resolve(repos)
   })
-  // console.log(data)
+})
+
+requestCurrentStarred.then(function(data){
+  console.log(data)
+}).catch(function(e){
+  console.log(e)
 })
 // var github = new GitHubApi({
 // })

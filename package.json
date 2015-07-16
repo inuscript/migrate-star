@@ -4,13 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "github": "^0.2.4",
-    "request": "^2.58.0"
+    "request": "^2.58.0",
+    "request-all-pages": "^0.3.1"
   }
 }
