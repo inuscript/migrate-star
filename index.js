@@ -1,32 +1,46 @@
 var requestAllPages = require("request-all-pages")
 var GitHubApi = require("github")
-var oldName = "suisho"
-var starListUrl = "https://api.github.com/users/" + oldName + "/starred"
-
-var option = {  
-  uri: starListUrl,
-  json: true,
-  body: {},
-  headers: {
-    'User-Agent': 'Request'
+var through = require("through")
+var setting = require("./setting.json")
+var githubRequest = function(url){
+  return {  
+    uri: url,
+    json: true,
+    body: {},
+    headers: {
+      'User-Agent': 'Request'
+    }
   }
 }
 
 var requestCurrentStarred = new Promise(function(resolve, reject){
-  requestAllPages(option, function(err, pages){
-    var repos = pages.reduce(function(acc, page){
-      var data = page.body.map(function(item){
-        return item.full_name
-      })
-      return acc.concat(data)
-    }, [])
-    resolve(repos)
-  })
+  var starListUrl = "https://api.github.com/users/" + setting.oldName + "/starred"
+
+  var option = githubRequest(starListUrl)
+
+  var opt = { 
+    limit: { maxPages: 2, abort: false }
+  }
+  var queue = []
+  requestAllPages(option, opt)
+    .pipe(through(function (data) {
+        var page = JSON.parse(data)
+        var data = page.body.map(function(item){
+          return item.full_name
+        })
+        queue = queue.concat(data) // SO EVIL
+      }
+    ))
+    .on("end", function(err, data){
+      resolve(queue)
+    })
 })
 
-requestCurrentStarred.then(function(data){
+function doStar(data){
   console.log(data)
-}).catch(function(e){
+  // PUT /user/starred/:owner/:repo
+}
+requestCurrentStarred.then(doStar).catch(function(e){
   console.log(e)
 })
 // var github = new GitHubApi({

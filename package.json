@@ -12,6 +12,8 @@
   "dependencies": {
     "github": "^0.2.4",
     "request": "^2.58.0",
-    "request-all-pages": "^0.3.1"
+    "request-all-pages": "^0.3.1",
+    "through": "^2.3.8",
+    "through2": "^2.0.0"
   }
 }
